@@ -10,11 +10,12 @@ public class SoundTrigger : MonoBehaviour
     float currentCD;
     public GameObject obj;
     AudioSource audioSource;
+    float t;
     // Start is called before the first frame update
     void Start()
     {
 
-        audioSource = GetComponentInChildren<AudioSource>();
+        audioSource = obj.GetComponentInChildren<AudioSource>();
     }
 
     // Update is called once per frame
@@ -25,27 +26,32 @@ public class SoundTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (isMusic) { currentCD = repCD; audioSource.Pause(); }
-        else { audioSource.Play(); }
+        if (isMusic) { currentCD = repCD; audioSource.Pause(); t = audioSource.time; }
+        else { audioSource.Play(); currentCD = repCD; }
         Debug.Log("Did things.");
     }
 
     private void OnTriggerStay(Collider other)
     {
-        if (isMusic && currentCD <= 0)
+        if (currentCD <= 0 && !isMusic)
         {
+            Debug.Log(currentCD);
             audioSource.Play();
             currentCD = repCD;
+            Debug.Log(currentCD);
             Debug.Log("played sound");
         }
         currentCD -= Time.deltaTime;
+        Debug.Log(currentCD);
     }
 
     private void OnTriggerExit(Collider other)
     {
         if (isMusic)
         {
-            audioSource.UnPause();
+            audioSource.Play();
+            // I don't remember if we were supposed to do this, but because unity decided to break, I forced it to work anyway using the line below.
+            audioSource.time = t;
             Debug.Log("Attempted to unpause.");
         }
     }
